@@ -1,6 +1,7 @@
 # Section 2: Scalability Patterns
 
 - [Load Balancing Pattern - Software Architecture & Cloud Computing Use Cases](#load-balancing-pattern---software-architecture--cloud-computing-use-cases)
+- [Pipes and Filters Pattern](#pipes-and-filters-pattern)
 
 ---
 
@@ -197,6 +198,121 @@ allows us to auto scale up / down
 - Combination between Auto-scaling and Load Balancing
 
 ---
+
+## Pipes and Filters Pattern
+
+Follows the analogy of a stream of water flowing through a series of pipes
+
+A well designed filter performs only a single operation on the incoming data and it's completed unaware of
+the rest of the pipeline
+
+---
+
+### Terminology
+
+- **Data Source**
+  - The origin of the incoming data
+  - Examples: Backend Service / FaaS element
+- **Data Sink**
+  - The final destination of the data
+  - Examples: Database / Distributed File System / External Service
+
+---
+
+### Problems Solved by Pipes and Filters Pattern
+
+- Tight Coupling
+  - Can't use different programming languages for different tasks
+    - Machine Learning
+    - Business Logic
+    - CPU Intensive Workload
+- Hardware Restrictions
+  - Each task may require different hardware
+    - Specialized Hardware
+    - Extra CPU
+    - Extra Memory
+    - Fast Networking
+- Low Scalability
+  - Each task may require a different number of instances
+
+---
+
+### Example Application - Monolithic Approach
+
+![Monolithic](assets/05.png)
+
+⬇️
+
+![Pipes and Filters](assets/06.png)
+
+⬇️
+
+![Pipes and Filters](assets/07.png)
+
+⬇️
+
+![Pipes and Filters](assets/08.png)
+
+---
+
+### Benefits of Pipes and Filters Pattern
+
+- We can use a different programming language for each operation
+- The entire pipeline can run optimally in terms of
+  - Performance
+  - Cost
+- High Scalability
+  - We can use a different number of instances for each operation
+- High Troughput
+  - Executing different operations in **parallel**
+
+---
+
+### Use Cases of Pipes and Filters Pattern
+
+- Processing of User Activity data in digital advertising business
+- Processing data from IOT (Internt Of Things) Devices
+- Ingesting and Processing of Video and Audio files
+
+---
+
+### Video Sharing Service Architecture
+
+When a new video is uploaded, it needs to go through a few stages, before it can be 
+optimally streamed simultaneously to different devices in different geographical locations
+
+
+![Video Sharing Service](assets/09.png)
+
+---
+
+### Important Considerations
+
+- Pipes and Filters involves additional **overhead** and **complexity**
+- Each Filter needs to be **stateless**, and should be provided with enough information as part of its input
+- **Not** a good fit for **transactions** (where atomicity and data consistency are important)
+  - Performing a Distributed Transaction across multiple independent components it's extremely difficult and inefficient 
+
+---
+
+### Summary
+
+- Pipes and Filters following the analogy of water flowing through pipes, and getting filtered on the way downstream
+- Problems solved by Pipes and Filters
+  - Freedom to choose technologies / Programming languages for each operation
+  - Running each operation on optimized hardware
+  - Ability to scale each component as needed
+- Walked through an example of ingesting / processing video / audio
+- Important Considerations
+  - Complexity and overhead
+  - Statelessness of each processing component
+  - Not a good fit for data *transactions*
+
+---
+
+
+
+
 
 
 
