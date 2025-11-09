@@ -2,6 +2,7 @@
 
 - [Load Balancing Pattern - Software Architecture & Cloud Computing Use Cases](#load-balancing-pattern---software-architecture--cloud-computing-use-cases)
 - [Pipes and Filters Pattern](#pipes-and-filters-pattern)
+- [Scatter Gather Pattern](#scatter-gather-pattern)
 
 ---
 
@@ -310,11 +311,151 @@ optimally streamed simultaneously to different devices in different geographical
 
 ---
 
+## Scatter Gather Pattern
+
+### Introduction
+
+In the Scatter Gather Pattern the Dispatcher, routes the requests to **all the workers**
+
+Later, the dispatcher
+- gathers the response from all the workers
+- Aggregates them into a single response
+- Sends it back to the sender
+
+---
+
+### Load Balancing Pattern vs Scatter Gather Pattern
+
+- In the Load Balancing pattern the workers are **identical**
+- In the Scatter Gather pattern the workers are **different**
+  - Same Application Instances - Different Data
+  - Different Services - Different Functionality
+  - External Services
+
+---
+
+### Core Principles
+
+- Each request to a worker is **independent** from each other
+- We can perform a large number of requests in **parallel**
+- We can provide a large amount of information in a **constant time**
+
+---
+
+### Use Cases for the Scatter Gather Pattern
+
+**Search Services - Internal Workers**
+
+- Search query to Backend Service on Cloud
+- Dispatch search query - as is - to a group of internal search worker instances
+- Each instance search for the important keywords
+  - with only a subset of documents, videos, images etc
+
+Once each worker finishes performing the search on each own subset of data
+- Sends back a response for aggregation on the backend server
+- Aggregation Component within the Backend Server can
+  - combine the data
+  - rank each quality
+- Sends one big response to the client (webpage)
+
+![Scatter Gather Pattern - Search](assets/10.png)
 
 
+---
+
+**Hospitality Services - External Workers**
+
+- Request for Hotels in Backend Service
+- Backend Service sends it to a large number of hotels asking for a quote
+
+Once we receive all the quotes
+- We can send back a list of all the available hotels
+- Sorted by price, star rating, any other criteria
+
+![Scatter Gather Pattern - 3rd party services](assets/11.png)
+
+---
+
+### Observations
+
+- Users are not aware of the number of workers
+  - all the communication is done in parallel
+- Users are not aware of whether the workers are
+  - Internal
+  - External
+- Scatter Gather Pattern is a great choice for High Scalability
+
+---
+
+### Important Considerations
+
+**Workers can become unreachable / unavailable at any moment**
+
+- The dispatcher has to make sure it sets an upper limit for the time it waits for the response
+- If the time limit has passed, we simply ignore them
+- Aggregate with the data we already gathered
+---
+
+**Decoupling the dispatcher from the workers**
+
+- If we use a message queue between the dispatcher and the workers
+  - we can remove the tight coupling dependency
+- Workers subscribe to **Queries Topic** (asynchronous communication between dispatcher and workers)
+- Another **topic for workers publishing** the results
+  - when a time has passed, the dispatcher can aggregate those results and send them to the user
+
+![Scatter Gather Pattern - Using a message queue between dispatcher and workers](assets/12.png)
+
+---
+
+**The time between the request and the result**
+
+- Immediate Result (<1000ms)
+  - Dispatcher and aggregator into a single service works well
+
+For tasks that take longer e.g. deep analysis / reporting, 
+we can separate the dispatcher and the aggregator into different services 
+
+For a user to be able to track that report / request
+- The dispatcher generates a unique Identifier
+- That identifier is sent back immediately to the user
+- Also published together with the message to the workers
+- When workers are done performing their part of the analysis they send the results to a **separate aggregation service** accompanied by that same identifier
+- The aggregatinon service, can aggregate the results from the individual workers
+- The aggregator can use that identifier as a key to store it's final result into it's own NoSQL database
 
 
+![Scatter Gather Pattern - Separating dispatcher and aggregator into different services](assets/13.png)
 
+End user can use the same id to talk to the aggregation service and easily retrive 
+- either the current status
+- get the final result
+
+---
+
+### Conclusion
+
+- The Scatter Gather Pattern is very powerful
+- It's used by many companies and services we use
+
+---
+
+### Summary
+
+- General structure includes
+  - Requester
+  - Workers
+  - Dispatcher / Aggregator
+- 3 Use Cases for the Pattern, where the workers can be
+  - Internal instances of the **same service** with access to **different data**
+  - **Different services** with different functionality
+  - **External services** that belong to other companies
+- 3 Important Considerations
+  - Upper limit on the time waiting for the responses
+  - Decoupling between the dispatcher / aggregator and the workers
+  - Using a unique identifier to allow efficient tracking of response and gathering the results, for long running reports
+
+---
 
 
 
