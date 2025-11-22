@@ -3,6 +3,7 @@
 - [Load Balancing Pattern - Software Architecture & Cloud Computing Use Cases](#load-balancing-pattern---software-architecture--cloud-computing-use-cases)
 - [Pipes and Filters Pattern](#pipes-and-filters-pattern)
 - [Scatter Gather Pattern](#scatter-gather-pattern)
+- [Execution Orchestrator Pattern for Microservices Architecture](#execution-orchestrator-pattern-for-microservices-architecture)
 
 ---
 
@@ -454,6 +455,139 @@ End user can use the same id to talk to the aggregation service and easily retri
   - Upper limit on the time waiting for the responses
   - Decoupling between the dispatcher / aggregator and the workers
   - Using a unique identifier to allow efficient tracking of response and gathering the results, for long running reports
+
+---
+
+## Execution Orchestrator Pattern for Microservices Architecture
+
+### Execution Orchestrator - Problem Statement
+
+- Monolithic Application approach is too restrictive for a large scale system
+
+Many companies break the monolithic application logic into seperately deployed and managed services
+- User Service
+- Account Service
+- Inventory Service
+
+each service is responsible for a sub domain or business logic
+
+How do we run a flow of business operations that involve multiple services which potentially may be stateless
+
+---
+
+### Execution Orchestrator - Role
+
+Extra service called **Orchestration Service**
+- No Business Logic
+
+Manages complex or long flows by calling different services through different APIs in the right order
+- Also responsible for handling exception and retries
+- Maintaining the state of the flow
+
+---
+
+### Orchestration Pattern
+
+- Extension of the *Scatter Gather Pattern*
+- Instead of 1 operation to perform in parallel we have a sequence of operations
+  - Some stages can be performed in parallel
+  - Others are performed sequentially
+- In the cloud, frequently used in Microservices Architecture, where each service is
+  - Limited to its domain
+  - Unaware of other microservices
+
+---
+
+### Benefits of Microservices Architecture - Reminder
+
+- Faster developement
+- Smaller codebase
+- Higher scalability
+
+---
+
+### Downside of Microservices Architecture
+
+- All the business logic is spread out across multiple services
+
+---
+
+### Solution - Execution Orchestrator
+
+- One centralized service (the Orchestrator Service), acting as the "brain"
+- Orchestration Pattern is used frequently in the industry
+
+---
+
+### Execution Orchestrator - Scaling the Orchestration Service
+
+Orchestrator can be also be deployed as multiple application instances on multiple computers behind a load balancer so we don't have to compromise on scalability or reliability
+
+---
+
+### Execution Orchestrator - Real Life Example
+
+- Video On Demand Service for users can watch movies
+- The System is Architecture as Microservices
+- Scenario - Registration of a new subscriber
+
+**Important Note**
+
+- The Orchestration Service is NOT an API Gateway
+- Fully understands the context of the request
+- Steps that need to happen in the flow
+
+
+![Orchestrator Service Example](assets/14.png)
+
+---
+
+### Execution Orchestrator Failure and Recovery
+
+- The Orchestration Service is the only service aware of the
+  - Context
+  - Execution Steps
+- It is responsible for dealing with issues that happen in the flow
+- It can take care of **retries**
+- Useful for **tracing and debugging** issues in the flow
+
+---
+
+### Video-on-Demand Service - Orchestrator Crash
+
+e.g. orchestrator crashes while a form submission is executed
+
+Since the original orchestration service instance is no longer available 
+- Registration request will be routed to a different instance by the load balancing
+- Unaware of Previous Registration Attempt!
+
+One way to keep track of the registration process is by
+- Maintaining it's own database
+- Orchestration Service can persist the state of the process
+- New instance can pick up the task at any stage
+
+---
+
+### Execution Orchestrator - Important Consideration
+
+- Common Mistake - Start adding business logic into the Orchestration Service
+- If the Orchestartion Service becomes
+  - Too smart
+  - Performs too much business logic
+- it becomes a big monolith
+- It's important to keep the scope of the Orchestration Service to "Orchestration Only"
+
+---
+
+## Summary
+
+- We learned about the Execution Orchestration Software Architecture Pattern
+- Execution Orchestrator Service which manages the business flow
+- The business logic is performed by the other services
+- Orchestration of a user registration across a large number of microservices
+- Failure and Recovery Situations
+  - Microservices fail and cannot finish their task
+  - The Orchestrator Service instances fails
 
 ---
 
