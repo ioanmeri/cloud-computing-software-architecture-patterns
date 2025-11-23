@@ -4,6 +4,7 @@
 - [Pipes and Filters Pattern](#pipes-and-filters-pattern)
 - [Scatter Gather Pattern](#scatter-gather-pattern)
 - [Execution Orchestrator Pattern for Microservices Architecture](#execution-orchestrator-pattern-for-microservices-architecture)
+- [Choreography Pattern for Microservices Architecture](#choreography-pattern-for-microservices-architecture)
 
 ---
 
@@ -590,6 +591,155 @@ One way to keep track of the registration process is by
   - The Orchestrator Service instances fails
 
 ---
+
+## Choreography Pattern for Microservices Architecture
+
+- Helps scale a complex flow of business operations
+- A "sibling" of the Orchestrator Pattern that solves a same problem
+
+The problem statement: 
+
+> How do we run a flow of business operations that involve multiple services, which may potentially be completely stateless
+
+Microservices are completely decoupled and potentially unaware of each other
+ 
+We need to complete a flow of transactions that span multiple microservices
+
+---
+
+### Orchestration Pattern - Drawbacks
+
+- Tight Coupling between all the microservices in the system
+  - e.g all development teams need to coordinate to make sure code changes to the orchestration service don't break any flow
+  - Looks like the Monolithic application we moved away from
+
+**Distributed Monolith Anti-Pattern**
+
+- We get all the
+  - **Problems** of a Monolithic Architecture
+  - **Issues** of Microservices Architecture
+  - **No Benefits** of Microservices Architecture
+- Solution - *Choreography Software Architecture Pattern*
+
+---
+
+### Choreography Pattern
+
+Remove the orchestrator service and replace it with a dump distributed message queue or message broker
+
+**Message Queue in Choreography**
+- Stores all incoming events
+- all microservices subscribe to relevant events from the message broker
+
+![Choreography Pattern](assets/15.png)
+
+Follows the analogy of a sequence of steps in a dance
+
+
+---
+
+### Choreography Pattern - Advantages
+
+- Communication is **asynchronous** means we can easily
+  - **Make changes** to the system
+  - Add / Remove services
+- Scale any flow to many services
+- Scale our organization easily
+  - Can have many teams
+  - Little friction
+
+In cloud environment all of the microservices can be implemented as Function as a Service (lambda)
+- They don't consume any resources until an event triggers execution
+- Not Billed When Not Running
+
+**Scaling**
+
+If one service needs to handle frequent events, it can scale automatically using autoscaling policies
+
+---
+
+### Choreography Pattern - Downsides
+
+- No centralized orchestrator
+  - A lot harder to troubleshoot
+  - A lot harder to trace the flow of events
+
+---
+
+### Choreography Pattern Example - Job Search Service
+
+- Candidate looking for a job
+  - Goes to our website
+  - Fills out a form
+- Information is ingested into our system
+- Our system automatically and continuously looks for job openings
+- The candidate gets notified about job opportunities through email, where they can "apply" to the job
+
+![Choreography Pattern Example](assets/16.png)
+
+![Choreography Pattern Example](assets/17.png)
+
+![Choreography Pattern Example](assets/18.png)
+
+---
+
+### Choreography Pattern - Benefits
+
+- The entire flow happens through asynchronous communication **without any central entity**
+- Reduced the
+  - **Cost**
+  - **Overhead**
+  - of having an orchestrator service
+
+**Service Recovery**
+
+Even if one of the services was down temporarily it did not result to any loss of messages.
+
+When that service comes back online it can consume those events from the message broker as if nothing happened.
+
+**Adding Service**
+
+Example: If we want to add a new service that notifies companies about new candidates with certain skills,
+we can add that service and let it subscribe to relevant events
+
+No need to modify other services
+- Loosely coupled
+- Can scale efficiently
+- Can run complex flows
+
+---
+
+### Choreography Pattern - Drawbacks
+
+- Hard to troubleshoot
+  - e.g. candidate didn't take some email
+- More complex integration tests
+- The more services we have the more challenging it becomes
+- Choreography pattern is more suitable for
+  - Simple flows
+  - Fewer services
+
+---
+
+### Summary
+
+- Drawbacks of Execution Orchestration pattern
+  - Tight coupling between services
+- Learned about the Choreography Software Architecture Pattern where
+  - All microservices work together as a dance team
+  - Communication is through asynchronous events
+- Covered a real-life example of a sign-up to a Job Service
+- Choreography benefits
+  - Scalable
+  - Cost efficient
+- Choreography drawbacks
+  - Hard to troubleshoot issues
+
+---
+
+
+
+
 
 
 
