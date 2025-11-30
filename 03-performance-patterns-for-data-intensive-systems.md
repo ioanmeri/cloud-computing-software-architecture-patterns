@@ -142,6 +142,73 @@ Reduce workers don't need to wait for all the map workers to finish
 
 ---
 
+### Map Reduce Pattern - Benefits
 
+- Map Reduce programming model allows us to
+  - Reuse the same software architecture
+  - Scale the processing of a task
+  - Run computations in parallel by many workers
+- The result
+  - Processing of massive amounts of data in a short time
+
+---
+
+### Map Reduce Pattern - Handling Failures & Recovery
+
+- Many worker computers ➡️ high chance of failure while processing data
+  - Master can ping reduce workers periodically
+  - Master can Reschedule to new worker
+    - If map worker failed, master needs to modify reduce worker for the new location
+- The failure of the master is less likely
+  - It's still a possibility
+  - Option 1: abort the entire map - reduce computation, start over with a new master
+    - Time penalty from redoing some computation
+  - Option 2: make the master take frequent Snapshots of the current scheduling
+    - Replay log to sync new master
+  - Can have a backup Master: Inactive but staying in sync
+    - Begins taking the role of master   
+
+---
+
+### Map Reduce Pattern - Cloud Applications
+
+Map Reduce Pattern is a perfect fit for the cloud environment because
+
+1. Cloud providers Instant access to as many machines as we need
+2. Map Reduce is a Batch Processing model (on demand / on schedule execution)
+  a. We pay only for the resources we use during the processing
+  b. We don't pay for maintaining of machines
+
+**Note**: We do pay for storing / accessing data, which is cheaper than compute resources
+
+---
+
+### Map Reduce Pattern - Implementation in Practice
+
+- We almost never implement Map Reduce on our own
+- We pick an open source / cloud vendor implementation
+- We still follow the same
+  - Data modeling
+  - Programming model (map + reduce)
+  - Defining execution parameters
+
+---
+
+### Summary
+
+- Introduction to Map Reduce Pattern
+- Motivation: Architecture and implementation for processing big data sets
+- Map Reduce programming model
+  - Map
+  - Reduce
+- Parts of the Map Reduce Architecture
+- Benefits
+  - Scaling any computation across massive amounts of data
+  - Processing in short time
+- Strategies for handling and recovering from failures of
+  - Workers
+  - Master
+
+---
 
 
