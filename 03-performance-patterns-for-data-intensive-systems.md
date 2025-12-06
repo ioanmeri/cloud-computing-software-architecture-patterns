@@ -1,6 +1,7 @@
 # Section 3: Performance Patterns for Data Intensive Systems
 
 - [Map Reduce Pattern for Big Data Processing](#map-reduce-pattern-for-big-data-processing)
+- [The Saga Pattern](#the-saga-pattern)
 
 ---
 
@@ -210,5 +211,126 @@ Map Reduce Pattern is a perfect fit for the cloud environment because
   - Master
 
 ---
+
+## The Saga Pattern
+
+### Saga Pattern - Problem Statement
+
+- Reminder: Microservices Architecture benefits
+  - High engineering velocity
+  - Scalability
+  - Etc
+- Important principle of Microservice
+  - One Database Per Microservices
+
+If we allow multiple microservices to share a database ➡️ we couple them with each other
+
+E.g if one teams want sto change the schema of a database, they need to coordinate with the other team
+- Those two teams they will have a meeting
+- Agree on changes first
+- Coordinate the migration so nothing breaks
+- Those changes have to be made for all microservices at the same time
+
+This defeats the purpose of microservices architecture
+
+---
+
+### Shared Database - Distributed Monolith Anti-Pattern
+
+We are back to the anti-pattern of a distributed monolith.
+
+The worst case scenario that we need to avoid.
+
+If we have a separate database per microservice we will not have that problem
+
+---
+
+### One Database per Microservice
+
+Each team can change
+- the schema
+- the entire stack
+
+without affecting other service
+
+---
+
+### Saga Pattern - Problem Statement
+
+- With one database per microservice **we loce ACID Transaction** properties
+- A transaction is a "sequence of operations that for an external observer should appear as a single operation"
+- So how do we manage data consistency across microservices within a distributed transaction?
+  - Solution: **Saga Pattern**
+
+---
+
+### Saga Architecture Pattern
+
+In the Saga Pattern we perform the operations that are part of a transaction as a sequence of local transactions in each database.
+
+Each successful operation triggers the next operation in the sequence.
+
+![Saga Architecture Success](assets/29.png)
+
+If a certain operation fails, the Saga pattern rolls back the previous operation / operations by applying **Compensating Operations** that have the opposite effect from the original operation 
+
+After we roll back, we can either abort the transaction entirely or Retry multiple times until we succeed.
+
+![Saga Architecture Failure](assets/30.png)
+
+---
+
+### Saga Pattern - Implementations
+
+- Saga Pattern can be implemented using
+  - Execution Orchestrator Pattern
+  - Choreography Pattern
+- With either of the implementations we can execute transactions
+  - That span multiple services
+  - Without a centralized database
+
+---
+
+### Saga with Execution Orchestrator Pattern
+
+In Execution Orchestrator Pattern we have an orchestrator service that manages the entire distributed transaction by calling different services in order and waiting for the response from all of them.
+
+![Saga Implementation with Execution Orchestrator](assets/31.png)
+
+Depending on the response of each service, the Orchestrator service decides whether to 
+- proceed with the transaction and call the next service
+- or Roll back the transaction and call the previous service with a compensating operation
+
+
+
+---
+
+### Saga with Choreography Pattern
+
+In the Choreography implementation of the Saga Pattern, we have a Message Broker in the middle
+- the services are subscribed to relevant events
+
+![Saga Implementation with Choreography Pattern](assets/32.png)
+
+we don't have a centralized service to manage the transaction, so each service is responsible for either
+- triggering the next event in the transaction sequence
+- or triggering a compensating event for the previous service in the sequence
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
