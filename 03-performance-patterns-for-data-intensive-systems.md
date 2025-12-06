@@ -318,8 +318,110 @@ we don't have a centralized service to manage the transaction, so each service i
 
 ---
 
+### Saga Pattern - Real Life Example
+
+Example: A company that sells tickets to events such as
+  - Live performances
+  - Movies
+  - Shows
+
+**Business requirements**
+
+Given a pool of tickets for a given event and each ticket corresponds to a particular seat
+
+When a customer purchases a ticket they get an assigned seat reserved specifically for them
+
+---
+
+### Ticket Selling implementation Monolith
+
+![Saga Implementation Example](assets/33.png)
+
+---
+
+### Ticket Selling Service - Requirements
+
+When a ticket reservation is complete, we guarantee
+
+1. User is not a bot/black listed agent
+2. Payment is collected from the customer
+3. We sell only one ticket for a seat
 
 
+
+![Saga Implementation Example](assets/34.png)
+
+![Saga Implementation Example](assets/35.png)
+
+![Saga Implementation Example](assets/36.png)
+
+![Saga Implementation Example](assets/37.png)
+
+![Saga Implementation Example](assets/38.png)
+
+![Saga Implementation Example](assets/39.png)
+
+![Saga Implementation Example](assets/40.png)
+
+![Saga Implementation Example](assets/41.png)
+
+![Saga Implementation Example](assets/42.png)
+
+![Saga Implementation Example](assets/43.png)
+
+![Saga Implementation Example](assets/44.png)
+
+![Saga Implementation Example](assets/45.png)
+
+![Saga Implementation Example](assets/46.png)
+
+![Saga Implementation Example](assets/47.png)
+
+![Saga Implementation Example](assets/48.png)
+
+![Saga Implementation Example](assets/49.png)
+
+![Saga Implementation Example](assets/50.png)
+
+![Saga Implementation Example](assets/51.png)
+
+![Saga Implementation Example](assets/52.png)
+
+![Saga Implementation Example](assets/53.png)
+
+![Saga Implementation Example](assets/54.png)
+
+![Saga Implementation Example](assets/55.png)
+
+![Saga Implementation Example](assets/56.png)
+
+![Saga Implementation Example](assets/57.png)
+
+
+---
+
+### Saga Pattern - Choreography Implementaton
+
+- Each service is responsible for
+  - Sending events in case of **success**
+  - Sending **compensating** events to previous services in the flow, in case of **failure**
+
+![Saga Implementation Example](assets/58.png)
+
+---
+
+### Summary
+
+- Saga Software Architecture Pattern helps with data consistency managament in Microservices Architecture
+- Allows performing distributed transactions across multiple databases
+- Saga Pattern implementations
+  - Execution Orchestrator Pattern
+  - Choreography Pattern
+- Saga Pattern principles
+  - Proceed with the transaction in case of **success**
+  - Roll back by performing *compensating* operations in case of **failure**
+  
+---
 
 
 
