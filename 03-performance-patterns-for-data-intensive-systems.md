@@ -2,6 +2,7 @@
 
 - [Map Reduce Pattern for Big Data Processing](#map-reduce-pattern-for-big-data-processing)
 - [The Saga Pattern](#the-saga-pattern)
+- [Transactional Outbox Pattern - Reliability in Event Driven Architecture](#transactional-oubox-pattern---problem-statement-example)
 
 ---
 
@@ -423,16 +424,145 @@ When a ticket reservation is complete, we guarantee
   
 ---
 
+## Transactional Outbox Pattern - Reliability in Event Driven Architecture
+
+### Problem statement
+
+Example: A service which performs some operations
+
+As part of the operation it needs to update the database and also publish an event to trigger the next operation in another service
+
+---
+
+### Transactional Oubox Pattern - Problem Statement Example
+
+- Example: Job Search Service
+- When a user registers, we trigger an immediate + on-schedule job search
+
+![Transactional Oubox Pattern](assets/59.png)
+
+Example Code
+
+```
+void addUser(User user){
+  Connection connection = db.connect();
+  connection.insert(user, "UsersTable");
+  messageBroker.send(new NewUser(user,...));
+}
+```
+
+Inserting a new record in the database and sending the event to the message broker is
+- **Not an Atomic Operation**
+- **Not a Transaction**
+
+The service may add the user to the database but right before it can send the event to the message
+broker it either crashes or loses connection
+
+The same problem occurs in the Saga Pattern, e.g. if the reservation service crashes before sending a event to the queue, the rest of the services will not be notified. Distributed transaction will get frozen forever.
+
+---
+
+### Transactional Outbox Pattern
+
+1. We add a new table to the Database called **Outbox**
+
+We update the relevant table and the Users table as part of a single database transaction
+- it's guaranteed that both tables will be updated or not
+
+2. We add another service called Message Sender / Message Relay Service
+
+Monitors the outbox table of the database, as soon as the new message appears in the table, it takes that message and sends it to the message broker and marks it as sent or simply deletes it.
+
+![Transactional Oubox Pattern 1](assets/60.png)
+
+![Transactional Oubox Pattern 2](assets/61.png)
+
+---
+
+### Transactional Outbox Pattern - Solution
+
+- Transactional Outbox
+  - Solves the problem of losing data / messages
+  - Guarantees that for each database update we trigger the appropriate event
+
+---
+
+### Transactional Outbox Pattern - Issues and Considerations
+
+1. **Duplicate Events**
+
+e.g. the sender service, reads the message from the outbox table and sends the event to the message broker
+
+But right before it marks the message as sent in the outbox table, the service instance crashes
+
+**At Least Once** - Delivery Semantics
+
+When the sender service instance is restarted, 
+- that same message (from outbox) will be send to the message broker again
+- results in a duplicate event
 
 
+**Idempotent Operation (First Message) - don't need any special handling**
+
+e.g. on the receiving end we may have a scheduling service
+
+When this service receives a message about a new user, signing up for our service
+- it adds a entry to it's database
+- the second message will simply override the first entry with the same data
+
+**Non-Idempotent Operation**
+
+e.g. if on receiving end there is a Billing Service that receives the same message twice
+- it will bill the user twice
+
+**Non-Idempotent Operation** with IDs Stored (Duplicate Message)
+
+Can be solved by assigning a unique id for each message in the outbox table
+- the message relay service attaches that ID to the event it publishes to the message broker
+- every consumer of that event can keep track of all the message ids
+
+---
+
+2. **No support for Transactions**
+
+We can add additional attributes that contains the message that needs to be sent to the message broker
+- Solved by adding fields to the original database document
+
+The message relay service can query for
+- users with "outbox" attribute
+
+It sends the message to the message broker and removes the attribute from record in db
 
 
+---
+
+3. **Ordering of Events**
+
+e.g.
+
+- Registration
+- Cancelation
+
+Order is important, we can assign each new message a sequence id that is always higher than the previous message
+in the outbox table
 
 
+---
 
+### Summary
 
+- Learned about Transactional Outbox Pattern
+- Each database operation is followed by an event published to a message broker
+- Main ideas
+  - Additional "outbox" table in the database
+  - Each update to a business logic table goes to the outbox table as part of a transaction
+  - Separate "sender" service monitors the outbox table
+- Potential issues with the pattern
+  - Duplicate events
+  - Lack of support for database transactions
+  - Reordering of events
 
-
+---
 
 
 
