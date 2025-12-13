@@ -3,6 +3,7 @@
 - [Map Reduce Pattern for Big Data Processing](#map-reduce-pattern-for-big-data-processing)
 - [The Saga Pattern](#the-saga-pattern)
 - [Transactional Outbox Pattern - Reliability in Event Driven Architecture](#transactional-oubox-pattern---problem-statement-example)
+- [Materialized View Pattern - Architecting High-Performance Systems](#materialized-view-pattern---architecting-high-performance-systems)
 
 ---
 
@@ -564,5 +565,119 @@ in the outbox table
 
 ---
 
+## Materialized View Pattern - Architecting High-Performance Systems
 
+### Data Storage
+
+When we have a lot of data that we need to store about the business / customers, the priority is to store that data
+- most efficiently
+- cost effectively
+
+meaning storing data in 
+- separate relational database tables
+- or storing some data into different NoSQL Database
+
+When we sent a query to read / aggregate / transform data we may found some issues
+
+---
+
+### Data Storage Issues
+
+- Performance when processing query
+- Efficiency and cost
+
+Solution: **Materialized View**
+
+---
+
+### Materialized View Pattern
+
+We create a read-only table and pre-populate it with the result of one particular query
+
+Each time we want to get the full of partial result query, we can read it from the materialized view 
+directly
+
+![Materialized View](assets/62.png)
+
+That saves a lot of latency and overhead, especially if the query involves 
+- complex aggregation functions
+- data transformations
+- table joins
+
+Whenever the raw data and the tables changes, we can either 
+- regenerate the Materialized View
+- on a fixed schedule
+
+![Materialized View](assets/63.png)
+
+---
+
+### Materialized View Pattern - Real Life Example
+
+Example: **Online Education Platform**
+
+Student can search and enroll to online courses
+- they can leave a course review
+- star rating
+  - contributes to the ranking of the course on search results
+
+![Education Platform](assets/64.png)
+
+![Education Platform](assets/65.png)
+
+we gave thousands of course, millions of users
+
+
+**Typical Log-in Scenario**
+
+- User logs in to the platform
+- Show top courses for a topic they are interested in
+  - ranked by the average rating of each course
+
+
+![Top Courses Based on Rating](assets/66.png)
+
+**Solution: Materialized View**
+
+- With Filtering on *Topic*
+- Without Filter on a *Topic*
+
+We can create a materliazed view e.g. only for Programming course, Arts
+
+---
+
+### Materialized View Pattern - Important Considerations
+
+- Additional Space for Materialized View
+  - Trade Offs
+    - Additional **Space** for **high performance**
+    - In the cloud - **cost** for **high performance**
+- Where to store the Materialized View?
+
+---
+
+### Materialized View Pattern - Where to Store?
+
+- Option 1: In the same database as the original data
+  - most modern databases that support Materialized View can make efficiently updates by applying only the deltas from the previous state
+  - Frequency of updates limited
+  - Not optimal for reading and querying
+- Option 2: Store in a separate, read-optimized database
+
+![Where to Store, in memory](assets/67.png)
+
+- Need to Keep Up-To-Date
+- Extra Code For Programmatic Updates to Materialized View
+
+---
+
+### Summary
+
+- New powerful performance pattern - Materialized View
+- Main ideas
+  - Pre-compute & pre-populate a **separate table** with the results of **particular queries**
+  - Significantly imporves the **performance** of those queries
+  - Saves **money** on frequently repeated data operations on the cloud
+
+---
 
