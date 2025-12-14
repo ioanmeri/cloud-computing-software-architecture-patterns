@@ -4,6 +4,7 @@
 - [The Saga Pattern](#the-saga-pattern)
 - [Transactional Outbox Pattern - Reliability in Event Driven Architecture](#transactional-oubox-pattern---problem-statement-example)
 - [Materialized View Pattern - Architecting High-Performance Systems](#materialized-view-pattern---architecting-high-performance-systems)
+- [CQRS Pattern](#cqrs-pattern)
 
 ---
 
@@ -680,4 +681,141 @@ We can create a materliazed view e.g. only for Programming course, Arts
   - Saves **money** on frequently repeated data operations on the cloud
 
 ---
+
+## CQRS Pattern
+
+Command and Query Responsibility Segregation
+
+### CQRS Terminology
+
+We can group the operations on data of a Database into:
+
+- Command
+  - An action we perform that results in data mutation (Insert, Update, Delete)
+- Query
+  - Only reads data and returns to the caller
+
+---
+
+### CQRS Command and Query Responsibility Segregation
+
+![CQRS](assets/68.png)
+
+- Command Service
+  - Business Logic
+  - Validation
+  - Permissions
+- Query Logic
+
+each part can evolve independently, e.g. in a New Release of Command Service no changes is needed in query service
+
+We duplicate data into two separate databases
+- Queries go to Read Database
+  - optimal database and configuration for reads
+  - optimal schema for reads
+- Optimize Write Database for write operations
+  -  optimal Schema for Writes
+
+makes all queries faster
+
+---
+
+### CQRS - Benefits
+
+- We can optimize our system for both types of operations
+  - Particularly important when we have frequent **reads** and **writes**
+- Higher Scalability
+  - we can adjust the number of instances for each service
+  - we can ajust the number of DB instances for each distributed DB
+
+---
+
+### CQRS - Synchronization
+
+**1. Message Broker**
+
+- Everytime a Command Service gets a Write / Update request
+- Will publish an event to a topic
+- The query service subscribe to
+- Makes the modification in it's own database
+
+
+![CQRS - Synchronization](assets/69.png)
+
+How we make sure each command request that is received by the command service ends up 
+- in a database
+- as well as in the message broker
+
+as a single transaction
+
+![CQRS - Synchronization with Transactiondal Outbox Pattern](assets/70.png)
+
+---
+
+**2. Function As A Service**
+
+- Function watches the command database for any data modifications
+
+---
+
+### CQRS - Issues / Drawbacks
+
+- We can only guarantee **Eventual** Consistency between the Command Database and the Query Database
+  - strict consistency may require another solution
+- Overhead and Complexity
+  - 2 separate services and databases we need to maintain / configure / deploy
+  - FaaS requires code maintenance
+
+---
+
+### Example: Online Store
+
+When a client clicks on one of the products they 
+- can see the the average rating
+- can read all the reviews
+- can rate it
+- leave a review
+
+**Reviews Table on Command Side**
+
+![CQRS Example 1](assets/71.png)
+
+![CQRS Example 2](assets/72.png)
+
+---
+
+**Online Store - Product Rating**
+
+- Do we need the exact average rating for each product at any given moment?
+  - Probably not
+
+![CQRS Read DB](assets/73.png)
+
+We can use a FaaS thar runs once an hour / once a day to recalculate all the ratings for each product
+
+We can provision the number of query service instances and DB replicas accordingly, we can scale them up and down using auto scaling policies based on the traffic
+
+![CQRS Read DB](assets/74.png)
+
+---
+
+### Summary
+
+- CQRS - Command and Query Responsibility Segregation
+- Provides "separation of concerns" that keeps each services
+  - Cleaner
+  - Easier to maintain
+  - Easier to evolve
+- We can optimize each database for its workload
+- Downsides
+  - Complexity
+  - Overhead
+  - **Eventual** Consistency
+- We need to make sure to make the right tradeoff based on the use-case
+
+---
+
+
+
+
 
