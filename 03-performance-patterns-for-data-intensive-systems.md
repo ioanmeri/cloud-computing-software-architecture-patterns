@@ -5,6 +5,7 @@
 - [Transactional Outbox Pattern - Reliability in Event Driven Architecture](#transactional-oubox-pattern---problem-statement-example)
 - [Materialized View Pattern - Architecting High-Performance Systems](#materialized-view-pattern---architecting-high-performance-systems)
 - [CQRS Pattern](#cqrs-pattern)
+- [CQRS + Materialized View for Microservices Architecture](#cqrs--materialized-view-for-microservices-architecture)
 
 ---
 
@@ -815,7 +816,98 @@ We can provision the number of query service instances and DB replicas according
 
 ---
 
+## CQRS + Materialized View for Microservices Architecture
 
+### Problem Statement
+
+In Microservices architecture we cannot join because databases are separate, instead
+- we need to do an API call to each of those microservices
+- programmaticaly aggregate the data
+
+---
+
+### Problems with Database Per Microservice
+
+- *Join* operations are slow to begin with
+  - that is we use materialized view
+- The situation in Microservices is even worse
+  - each call it's a network request that takes time
+  - Microservice needs to talk to it's own database
+  - Aggregation adds overhead
+- The overhead of multi-service data join in unacceptable
+- **Solution**: CQRS + Materialized View Patterns
+
+---
+
+### CQRS + Materialized View
+
+We are going to create a Materialized View of the data of **both microservices**
+
+To keep the materialzied view in sync
+- Introduce a Message Broker and each time Microservice A / B modifies it's data
+  - Publishes an event to a particular topic
+  - Query microservice subcribes to those events
+  - Makes updates to each own materialized view
+
+![CQRS + Materialized View + Message Broker](assets/75.png)
+
+A Second approach is using a Cloud Function
+- to watch either of those tables
+- Whenever there is an update to those tables
+- Function will run custom code
+- Update the materialized view in the query database
+
+We get only **Eventually Consistency** between the base tables and the materialized view 
+
+![CQRS + Materialized View + Message Broker](assets/76.png)
+
+---
+
+### Real World Example
+
+Example: Online Education Platform
+
+Everytime a student searches for a course we need to pull and join data from
+- courses service and database
+- reviews service and database
+
+![CQRS + Materialized View Example](assets/76_2.png)
+
+
+To join that data and present it in the most optimal way to the user
+- we create Course Search Service
+- has it's own read optimized database
+- will store a materialized view of all relevant information
+  - that data will be pulled from courses and reviews services
+
+![CQRS + Materialized View Example](assets/77.png)
+
+
+Everytime the price / title / subtitle of the course changes
+- it's published to the message broker
+- consumed by the course search service
+
+![CQRS + Materialized View Example](assets/78.png)
+
+![CQRS + Materialized View Example](assets/79.png)
+
+Similarly for new reviews, that triggers an event that is consumed by the course search service
+- we can either **immediatly update** the course search service materialized view
+- or **update periodically** to avoid frequent updates
+
+---
+
+### Summary
+
+- Using CQRS + Materialized View we were able to solve an important problem in microservices architecture
+  - Joining data from multiple microservices with separate databases
+- By using
+  - **Materialized View**, we placed the joined data in a separate table
+  - **CQRS**, we stored the materialized view in separate databases
+      - Each behind its own microservice
+  - **Event Driven Architecure** we keep the external Materialized View up-to-date with the original data
+
+---
 
 
 
