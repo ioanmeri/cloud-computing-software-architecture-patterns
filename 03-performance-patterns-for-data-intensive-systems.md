@@ -6,6 +6,7 @@
 - [Materialized View Pattern - Architecting High-Performance Systems](#materialized-view-pattern---architecting-high-performance-systems)
 - [CQRS Pattern](#cqrs-pattern)
 - [CQRS + Materialized View for Microservices Architecture](#cqrs--materialized-view-for-microservices-architecture)
+- [Event Sourcing Pattern](#event-sourcing-pattern)
 
 ---
 
@@ -909,5 +910,142 @@ Similarly for new reviews, that triggers an event that is consumed by the course
 
 ---
 
+## Event Sourcing Pattern
+
+### Problem Statement
+
+Generally, applications write data to the database and any modification overwrites the previous data
+- Reflects the new state
+- We can use a backup to find previous state
+- Use of CRUD operations
+
+---
+
+### Event Sourcing - Problem Statement
+
+In certain situations we need to know
+- The **current** state
+- Every **previous** state
+
+Example 1: Online Bank needs a Transaction History
+
+Reasons
+- Visualization
+- Auditing
+- Corrections
+
+Example 2: Merchant Inventory
+
+from 200 items in the morning got 100 items in afternoon
+- is it 100 items sold?
+- or 200 items and 100 returns?
+- 1 time bulk purchase?
+
+we need to see the steps that led to the current state
+
+**Solution: Event Sourcing**
+
+---
+
+### Event Sourcing Pattern
+
+Instead of storing the current state, we have only events
+
+Each event describes either
+- a change or
+- a fact
+
+Events are **Immutable**, we can only **Append** new events to the end of the log
+
+To find the current state we replay all the events
+
+---
+
+### Event Sourcing Pattern - Version Control Analogy
+
+This is like version control but for data, where each **event represents only the delta** or the change
+from the previous state
+
+---
+
+### Bank Example
+
+By looking at the transaction log we can notice
+- duplicate transactions
+- suspicious patterns (e.g. from different locations)
+
+We can also provide insights for better spending habits or recommend another product
+
+---
+
+### Event Sourcing - Where to Store Events
+
+- Database - Separate record for each event
+  - We can perform queries and analytics
+    - Track one order
+    - Track multiple orders
+    - Get insights on data
+- Message Broker
+  - Particularly optimized for handling a lot of events
+  - Make it easy to maintain the order of different events
+  - Not as good for complex queries
+
+---
+
+### Event Sourcing - Benefits
+
+- Visualization
+- Auditing
+- Corrections
+- **High Write Performance**
+
+In a Database when we have high contention that leads to Poor performance
+
+If we move to event sourcing
+- No Locking
+- No Contention
+
+---
+
+### Event Sourcing - Replaying Events
+
+Strategies
+- Snapshots
+  - Replay from Last Snapshot Only
+- CQRS Pattern
+  - Separate the part that appends events from the query pattern
+
+---
+
+### Event Sourcing & CQRS
+
+- The combination (Event Sourcing + CQRS) is very popular
+- Reasons
+  - We get **history** and **auditing**
+  - We get *fast* and *efficient* **writes**
+  - We get *fast* and *efficient* **reads**
+
+We can get only **eventually consistency**
+
+![Event Sourcing + CQRS](assets/80.png)
+
+---
+
+### Summary
+
+- Learned Event Sourcing Architecture Pattern
+  - Instead of storing / updating current state
+  - We store only changes / facts using events
+- Ways to store events
+  - Database
+  - Message Broker
+- Side benefits
+  - Higher write performance (for write-intensive workloads)
+- Powerful combination of Event Sourcing and CQRS
+  - Auditing
+  - Performant write
+  - Efficient Reads
+  
+---
 
 
