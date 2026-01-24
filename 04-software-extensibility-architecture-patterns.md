@@ -94,5 +94,45 @@ Also the isolation we get by running the sidecar as a separate process
 
 ---
 
+### Ambassador Sidecar Pattern
+
+An ambassador is a special sidecar that is responsible for sending all the network requests on behalf of the service
+
+It is like a **Proxy** but it runs on the same host as the core application
+
+**Benefits**
+- We offload all the complex network communication logic outside of the service
+- Codebase of the core service has only Business Logic
+
+**Ambassador responsibilities**
+- Retries
+- Disconnections
+- Authentication
+- Routing
+- Protocol Versions
+
+We can perform distributed tracing across multiple services
+
+Example: Troubleshoot a transaction that spans multiple services
+
+---
+
+### Summary
+
+- Sidecar Pattern extends the functionality of a service
+  - No need to **reimplement** in every programming language
+  - No need to **deploy** as a service on additional hardware
+- Sidecar benefits
+  - **Isolation** between the sidecar and the core application
+  - Has **access** to the same **resources**
+  - **Low overhead** of interprocess communication
+- Ambassador Sidecar Pattern offloads
+  - **Network** communication
+  - **Security** from the core application to the sidecar
+
+---
+
+
+
 
 
