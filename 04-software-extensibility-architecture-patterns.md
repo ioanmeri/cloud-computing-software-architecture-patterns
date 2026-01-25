@@ -1,6 +1,7 @@
 # Section 4: Software Extensibility Architecture Patterns
 
 - [Sidecar & Ambassador Pattern](#sidecar--ambassador-pattern)
+- [Anti-Corruption Adapter Pattern](#anti-corruption-adapter-pattern)
 
 ---
 
@@ -131,6 +132,123 @@ Example: Troubleshoot a transaction that spans multiple services
   - **Security** from the core application to the sidecar
 
 ---
+
+## Anti-Corruption Adapter Pattern
+
+### Anti-Corruption Adapter / Layer Pattern
+
+**Scenarios Pattern Applied**
+
+- Migration
+  - Anti-Corruption Layer is temporary
+- Two Part System
+  - Anti-Corruption Layer is permanent
+
+Example: Monolithic Application
+- 10 year old code
+- Old technologies
+- Complex DB schema
+- Code is too complex
+- Team is too big
+- Exposed via outdated API
+
+---
+
+### From Monolithic Architecture to Microservices Architecture
+
+- During the migration we want to
+  - Modernize the system
+  - End up with a modern technology stack
+- Issues
+  - We cannot stop all development during the migration
+
+---
+
+### Splitting Monolith Into Microservices
+
+- We take a small isolated part of the monolithic application
+- Create a brand new service with each own Database for that functionality
+- Run it together with the original monolith
+- We repeat the process over and over until the original monolith is gone
+
+However, until we get to all microservices solution, the small set of microservices, still rely to the old monolithic application for some functionality and data
+
+---
+
+### Problem Statement: Corruption
+
+New Part of System that neads to support old protocols / APIs and data models of the old part of the system
+
+This leads to **Corruption** of the new and clean services that now have to carry legacy code all around it's codebase until the migration is complete
+
+---
+
+### Anti-Corruption Pattern
+
+We deploy a new service between the old system and the new system, that acts as an adapter
+
+The Anti-corruption service performs all the translations and forwards the request to that old monolithic application
+
+Similar if the old monolithic application needs to talk to any of the new microservices, it talks only to the Anti-Corruption Adapter Service
+
+![Anti Corruption Pattern Migration 1](assets/83.png)
+
+![Anti Corruption Pattern Migration 2](assets/84.png)
+
+---
+
+### Banking Company Example (Two Parts System)
+
+![Anti Corruption Pattern Two Parts System 1](assets/85.png)
+
+![Anti Corruption Pattern Two Parts System 2](assets/86.png)
+
+
+---
+
+### Anti-Corruption Layer Important Notes
+
+- Anti-Corruption Service needs
+  - Development
+  - Testing
+  - Deployment
+  - Scalability
+
+---
+
+### Anti-Corruption Layer Overhead
+
+- Anti-Corruption Service will always have some
+  - Performance overhead (latency)
+  - Additional **cost** on the cloud environment
+
+
+---
+
+### Anti-Corruption Pattern with FaaS
+
+One way to mitigate the issue of cost is to deploy the adapter as a FaaS
+
+![Anti Corruption Layer](assets/87.png)
+
+---
+
+### Summary
+
+- Learned about the Anti-Corruption Adapter / Layer Pattern
+- Two scenarios for the pattern
+  - Migration between architectures
+  - Running 2 systems permanently side-by-side
+- Challenges
+  - Resources (Additional service to maintain)
+  - Development
+  - Latency
+
+---
+
+
+
+
 
 
 
