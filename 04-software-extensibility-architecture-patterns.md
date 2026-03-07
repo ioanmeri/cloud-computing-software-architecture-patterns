@@ -304,16 +304,119 @@ Backend team needs to coordinate Frontend team and approve pull requests
 
 ---
 
+### Backend Team, Frontend Team - Issues
+
+- Backend engineers prefer code / API reusability
+- Issues
+  - Unified experience will not take **full advantage** of each type of frontend
+  - Each client experience may be **sub-optimal**
+- Solution: **Backends For Frontends Pattern**
+
+---
+
+### Backends For Frontends Pattern
+
+Using this pattern we break this monolithic backend service into separate backends
+- one for each type of frontend
+
+Each of those backend services contain only the functionalities of the relevant frontend
+- makes it's codebase a lot smaller
+- it's runtime lighter
+- less resource intensive
 
 
+![Backend for frontends pattern](assets/90_1.png)
 
 
+More importantly, it's code is **fully dedicated to provide the best and most optimal experience** for that particular web frontend only
+
+**Organizational Side**
+
+- we can have a dedicated team of full stack developers dedicated to each pair of frontend / backend
+- e.g. iOS Team doesn't have to depend on another team
+
+---
+
+### Backends For Frontends - Challenges
+
+- One backend - All functionality is in one place
+- Multiple backends - How to avoid duplicating shared functionality?
+- Granularity - How many types of Backend For Frontends?
+
+**Example: E-commerce platform**
+
+Web frontend / iOS Frontend / Android Frontend
+- Different shopping experience but a few parts remain the same
+- e.g. login, signup, checkout require the same inputs and business logic
+- can use a **shared library** and reuse it across multiple services
+
+---
+
+### Shared Library - Issues
+
+- A shared library may
+  - Tightly couple codebases
+  - Create friction between teams
+- Reason
+  - Changes in the shared library affect all backends and requires
+    - Coordination
+    - Meetings
+    - Thorough testing
+    - Lack of ownership
+
+Another approach is to have the shared library as a separate service with a clear and well-defined scope / API / ownership
+
+---
+
+### Granularity of Backends for Frontends
+
+How many types of Backend For Frontends?
+- The answer is - "It depends"
 
 
+![Backend for frontends pattern](assets/90.png)
+
+![Backend for frontends pattern](assets/91.png)
 
 
+Examine difference between experiences between Android / iOS. Yes? Should have two separate dedicated backends. No? should add extra granularity
 
+---
 
+### Cloud Environment Configuration
+
+![Backend for frontends pattern](assets/92.png)
+
+If we decide to run more server side computations for mobile frontends, we may need machines that have stronger CPUs or have more memory
+
+---
+
+### Request Routing
+
+We can also utilize the cloud computing load balancing service to route requests to the right type of backend, using
+- URI paths
+- URL parameters
+- HTTP Headers
+  - e.g. User agent header which tells what type of device or platform the request is coming from
+
+![Backend for frontends pattern](assets/93.png)
+
+---
+
+## Summary 
+
+- Problem with multiple types of frontends interacting with a monolithic backend
+  - Code complexity
+  - Device / frontend based features
+  - Friction between 2 separate (frontend and backend) development teams
+- Solution: **Backends For Frontends**
+  - Separate services
+  - Fullstack teams with full end-to-end ownership
+- Challenges
+  - Share common logic
+  - Granularity of backends
+
+---
 
 
 
