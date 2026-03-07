@@ -2,6 +2,7 @@
 
 - [Sidecar & Ambassador Pattern](#sidecar--ambassador-pattern)
 - [Anti-Corruption Adapter Pattern](#anti-corruption-adapter-pattern)
+- [Backends for Frontends Pattern](#backends-for-frontends-pattern)
 
 ---
 
@@ -245,6 +246,71 @@ One way to mitigate the issue of cost is to deploy the adapter as a FaaS
   - Latency
 
 ---
+
+## Backends for Frontends Pattern
+
+**BFFs - Backends For Frontends**
+
+### Problem Statement
+
+**Example: E-Commerce System Archicture**
+
+In the middle, short of the edge of our system we have the backend that serves the frontend code
+- servers static and dynamic content
+- also handles requests for additional web pages / data
+
+The problem begins, as always with large scale systems, when our company becomes more successfull
+- front-end code becomes more complex / rich in features
+- back-end also becomes more complex
+
+![BFFs problem statement](assets/88.png)
+
+As some point we may also introduce a front-end for mobile devices
+- we start adding mobile specific code
+- mobile specific features to the back-end
+  - e.g. new APIs that send less or maybe even slightly different data
+  - also should be more cautious about mobile devices battery life
+
+We need to rethink the entire UX to 
+- minimize the number of network requests
+- offload work from frontend to backend
+- also mobiles have native features like
+  - mobile camera to e.g. scan a barcode
+  - location based request
+
+Desktop have larger screens so they need to see more data
+
+![Backend complexity for multiple frontends](assets/89.png)
+
+
+Now we have a backend service that has to support features for multiple types of frontends
+- Desktop features
+- Mobile features
+- Shared features
+- also may extend to support platform specific features for iOS or android
+- may add more types of devices
+  - Smart watch features
+  - Game console features
+  - Smart TV features
+
+The problem is that this monolithic backend service is now very
+- **big**
+- **complex**
+- **full of features for different frontends**
+
+Backend team needs to coordinate Frontend team and approve pull requests
+- API details
+- prioritize and coordinate the work
+
+---
+
+
+
+
+
+
+
+
 
 
 
