@@ -69,6 +69,7 @@ When we are the clients, calling external services and we want to protect oursel
 - Dropping Requests
   - Send back a response with error code 429 - "Too many requests"
 - Queue up the requests and process them later
+- Reduce Quality / Limit Bandwidth
 
 ---
 
@@ -81,10 +82,91 @@ We can throttle the number of requests / sec a client can send us to get the pri
 
 If the client attempts to send us more requests, we can simply drop and ignore them on the server side.
 
+**Queue up**
+
+We can simply queue those requests either in a log or a message broker and then execute those trades at a pace that does not exceed the limit we set for that client
+- we simply slow down or degrate the service we provide to that client
 
 
+![Throttling with a queue](assets/96.png)
+
+We can combine those strategies and set a limit on the number of trades we can perform per day, and if that daily limit is exceeded we start dropping those requests.
+
+This will prevent a situation where the client keeps sending us more and more trading requests, which may in turn overload the capacity of our queue
+
+---
+
+### Example: Streaming Platform
+
+We can throttle the client by reducing the resolution or bitrate of the video / audio.
+- we essentially throttle the bandwidth without denying the service
+
+If we detect that the client is maliciously trying to consume too much data, we can also set an upper limit on the number of movies or songs that they can watch or listen too
+
+---
+
+### Throttling & Rate Limiting - Important Considerations
+
+- Whether to throttle on
+  - API basis
+  - Customer basis
+- Multi-service throttling
+
+---
+
+### Global Rate Limit
+
+We can look at the API endpoint and set a global rate limit for all the clients together to that endpoint.
+
+The benefit of this approach is we can easily guarantee that our system does not go over the request rate that we can handle or budgeted for
+
+The obvious downside is that one client can suddently send us a very high number of requests and therefore unfairly deprive the other clients of getting service
+
+![Throttling global limit](assets/97.png)
 
 
+On the other hand we can implement throttling on a per customer basis.
+
+This way we guarantee that each customer gets a fair share of our resources and their level of service is isolated and independent from other customers.
+
+The downside of this approach is now a lot harder for us to control the total request rate from all the customers
+- especially gets harder if we constantly get new customers
+- can also get very complex if we have multiple tiers of customers (Premium, Basic, Free) where each customer get different quotas based on the level of subscription
+
+
+![Throttling per customer](assets/98.png)
+
+---
+
+## Example: Stock Trading Company with multi-service throttling
+
+![Throttling mutli service throttling](assets/99.png)
+
+
+Each client can request a price of either one or multiple stocks / bonds or other asset classes, as a **single** request to our API endpoint.
+
+Internally, that single request can result in multiple concurrent requests to different services
+
+If we only throttle externally on an API basis or customer basis the we may end up overwhelming different parts of our system at different times depending on the workload - complex throttling.
+
+---
+
+### Summary
+
+- Throttling - Setting a limit of the:
+  - Number of requests
+  - Amount of data can be sent / received per unit of time
+- Types of throttling
+  - Client Side Throttling
+  - Server Side Throttling
+- Important considerations
+  - Customer base throttling vs Global (API level) throttling
+  - External throttling vs Service based throttling
+- Conclusion: The best approach depends on
+  - Use-case
+  - Requirements 
+
+---
 
 
 
