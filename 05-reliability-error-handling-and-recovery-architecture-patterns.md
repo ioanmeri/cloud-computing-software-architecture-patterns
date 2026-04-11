@@ -220,6 +220,9 @@ from the user
 - Which errors to retry?
 - What delay / backoff strategy to use?
 - Adding randomization / Jitter between retries
+- How many times / how long to retry?
+- Is the operation idempotent?
+- Where to implement the retry logic?
 
 ---
 
@@ -305,6 +308,59 @@ Even with fixed or exponential delay - No delay randomization causes high load
 
 ---
 
+### Timeboxing
+
+If the remote service we were trying to call, didn't respond or returned a successful result after 1 second
+
+We can send back an error message that we are currently experiencing internal issues
+- Timeout error
+
+We also need to alert the engineers on-call
+
+----
+
+### Idempotency
+
+If the service we are trying to call is the payment service, if we are not careful
+- we may accidentally bill the user twice while retrying
+
+Option 1: Payment Service did NOT Receive the Request
+
+Option 2: The Confirmation from the Payment Service did NOT arrive
+
+> Retrying **Idempotent** Operations is **Safe**
+
+> Retrying **Non-Idempotent** Operations is **NOT Safe**
+
+---
+
+### Where to implement the retry logic?
+
+- Reusing Shared Library reused by multiple services
+- Moving that logic entirely off the service code
+  - Deploying it as a separate process running on the same service instance
+  - Ambassador Pattern
+  - Application code is free from any retry logic
+
+![Retry Pattern - Where to implement - Ambassador Pattern](assets/108.png)
+
+---
+
+### Summary
+
+- Learned about the Retry Pattern for handling errors
+- Allows us to hide internal errors from the user by re-sending the request
+- Important considerations
+  - Retrying only : Short, Temporary and Recoverable errors
+  - Delay between subsequent retries
+  - Randomization / Jitter
+  - Timeboxing / limiting the number of retry attempts
+  - Idempotency
+  - Retry implementation
+    - Shared library
+    - Ambassador Sidecar
+
+---
 
 
 
