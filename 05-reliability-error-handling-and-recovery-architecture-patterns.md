@@ -218,6 +218,8 @@ from the user
 ### Retry Pattern - Important Considerations
 
 - Which errors to retry?
+- What delay / backoff strategy to use?
+- Adding randomization / Jitter between retries
 
 ---
 
@@ -237,5 +239,79 @@ Request may end up being routed by the load balancer to a different instance.
 If the request ends up to the same instance there is a high chance that the instance has already recovered
 
 ---
+
+### Retry Storm
+
+> A situation that can cause unrecoverable cascading failure in the system
+
+Example: 2 instances encountered failures and are in the process of getting fixed and restarted
+
+For some duration are not available
+- All the requests to them will fail
+- Calling service will start sending retries
+- Will be routed by the load balancer to the rest of the services
+
+If we don't implement a delay or backoff in between retries, we may end up overwhelming the healthy instances
+with more requests that they can handle
+- This in turn will cause more timeouts and errors
+- Will result in more retries
+
+We can get to a point that the entire service goes down
+
+Solution: Add a delay betweeen subsequent retries
+
+---
+
+### Retry Pattern - Backoff Strategy
+
+- Allows the faulty service to fully recover
+- Strategies
+  - Fixed Delay
+  - Incremental Delay
+  - Exponential Backoff
+- Note: The approach you choose depends on your system
+
+![Retry Pattern Backoff Strategy - Fixed](assets/103.png)
+
+![Retry Pattern Backoff Strategy - Incremental](assets/104.png)
+
+![Retry Pattern Backoff Strategy - Exponential](assets/105.png)
+
+
+---
+
+### Retry - Jitter
+
+> RetryDelay(i) = i*(100 + rand(-15, 15))[ms]
+
+All instances of one service see that instance crash at the same time
+
+We may start sending retry requests to the rest of the remote service instances
+- in complete or almost complete synchronization
+
+Even with fixed or exponential delay - No delay randomization causes high load
+
+---
+
+### Synchronized Retries
+
+![Retry Pattern - Synchronized retries](assets/106.png)
+
+---
+
+### Retries with Jitter
+
+![Retry Pattern - Retries with Jitter](assets/107.png)
+
+---
+
+
+
+
+
+
+
+
+
 
 
