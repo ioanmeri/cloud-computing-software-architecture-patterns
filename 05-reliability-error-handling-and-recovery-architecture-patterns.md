@@ -1,6 +1,7 @@
 # Section 5: Reliability, Error Handling and Recovery Software Architecture Patterns
 
 - [Throttling and Rate Limiting Pattern](#throttling-and-rate-limiting-pattern)
+- [Retry Pattern](#retry-pattern)
 
 ---
 
@@ -168,6 +169,73 @@ If we only throttle externally on an API basis or customer basis the we may end 
 
 ---
 
+## Retry Pattern
 
+### Problem Statement
+
+![Retry Pattern - Problem Statement](assets/100.png)
+
+---
+
+### Cloud Environment Issues
+
+- Software / Hardware / Network errors introduce
+  - Delays
+  - Timeouts
+  - Failures
+
+**Two scenarios**
+- 1. Successful Response
+- 2. Error or Timeout
+
+---
+
+### Error Categorization
+
+The first thing we need to do in the second scenario is error categorization
+- User Error
+  - HTTP 403 (Not Authorized)
+    - We simply send the error back to the user: Error Info
+- System Error
+  - We need to try our best to hide the error from the user and recover if possible
+
+Recover from system error solution: **Retry Pattern**
+
+---
+
+### Retry Pattern
+
+We simply retry the same operation by resending the same request to the remote server until
+we get a successful response
+
+![Retry Pattern](assets/101.png)
+
+If we do get a successful response in a reasonable amount of time then we succeeded in hiding our internal issues
+from the user
+
+---
+
+### Retry Pattern - Important Considerations
+
+- Which errors to retry?
+
+---
+
+### Which Errors to Retry?
+
+Only if we have reason to believe that the error is
+- **Short**
+- **Temporary**
+- **Recoverable**
+
+Example: HTTP 503 (Service Unavailable: Busy or down temporarily) 
+
+Request may end up being routed by the load balancer to a different instance.
+
+![Retry Pattern Load Balancer](assets/102.png)
+
+If the request ends up to the same instance there is a high chance that the instance has already recovered
+
+---
 
 
