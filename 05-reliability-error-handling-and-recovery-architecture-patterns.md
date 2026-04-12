@@ -431,6 +431,75 @@ for making those calls to the faulty service
 
 ---
 
+### Circuit Breaker Pattern - States
+
+If we stop sending any requests to the faulty service, how will we know when it's back and healthy?
+
+For that the circuit breaker has a third state: **Half-Open State**
+
+Allows a small percentage of requests to go through and be sent to the remote service
+
+If the success rate of those requests that do go through is high enough then the circuit braker assumes that the service recovered and transitioned back to the close state
+
+Otherwise, if the success rate of those sample requests is still low then the circuit braker assumes that the service is still unhealthy and transitions back to the open state
+
+![Circuit Breaker Half Open](assets/112.png)
+
+---
+
+### Circuit Breaker Pattern - Important Considerations
+
+- What to do with the outgoing request to the external service when the Circuit Breaker is open?
+  - Drop it (with proper logging)
+  - Log and Replay
+- What response should we provide to the caller?
+  - Fail Silently
+    - e.g. no image / placeholder
+  - Best Effort
+    - e.g. send cached image
+- Separate Circuit Breaker for every external service
+- Replace the Half-Open state with Asynchronous Pings / Health Checks to the external Service
+  - No real requests involved
+  - Small requests without payload
+  - Need to decide on frequency of pings
+- Where to implement the Circuit Breaker Pattern?
+
+---
+
+### Implementation of Circuit Breaker Pattern
+
+- 1. Circuit Breaker Library
+- 2. Ambassador
+     - runs along with our service instance on the same host
+
+---
+
+### Conclusion
+
+Circuit Breaker Pattern is very powerful for handling long-lasting errors
+
+---
+
+### Summary
+
+- Circuit Breaker is useful for errors that
+  - There's no point in retrying
+  - Very costly
+- 3 States
+  - Closed State
+  - Open State
+  - Half-Open State
+- Important considerations
+  - What to do with outgoing request in an Open State?
+  - What response do we provide to the caller?
+  - Separate Circuit Breaker for each external service
+  - Replacing Half-Open State with Asynchronous health checks
+  - Where to implement the Circuit Breaker Pattern?
+
+---
+
+
+
 
 
 
