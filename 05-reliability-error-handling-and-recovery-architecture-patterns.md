@@ -2,6 +2,7 @@
 
 - [Throttling and Rate Limiting Pattern](#throttling-and-rate-limiting-pattern)
 - [Retry Pattern](#retry-pattern)
+- [Circuit Breaker](#circuit-breaker)
 
 ---
 
@@ -362,8 +363,73 @@ Option 2: The Confirmation from the Payment Service did NOT arrive
 
 ---
 
+## Circuit Breaker
 
+### Circuit Breaker Pattern
 
+- We used the Retry Pattern to handle system failures like
+  - Timeouts
+  - Server crashes
+  - Network issues
+- The main assumption was the failures are
+  - Short
+  - Temporary
+  - Recoverable
+
+**Example: Online Dating System**
+
+Image System is down due to some serious issue
+
+![Circuit Breaker Motivation](assets/109.png)
+
+What should the online dating service do?
+
+Since the issue is not short, temporary or recoverable then retrying a failed request to
+that service is not going to help
+
+---
+
+### Circuit Breaker Pattern - Motivation
+
+- The last N requests to the Image Service in the last minute failed
+  - Should we keep retrying and holding the user?
+  - or Save resources and NOT retry?
+- Retry Pattern - **Optimistic** approach
+  - First request failed next will succeed
+- Circuit Breaker - **Pessimistic** approach
+  - First requests failed next will also fail
+
+Follows the electric circuit breaker analogy
+
+---
+
+### Circuit Breaker Pattern
+
+The circuit breaker wraps the remote calls we make from one service to another.
+
+In it's normal operation when the circuit is closed, the circuit breaker keeps track
+of the number of successful requests and failed requests for any given period of time
+
+e.g. 20 of the requests to a particular external service returned a successful response
+and 2 of them timed out
+
+As long as the failure rate stays low, the circuit remains closed and every request from our service
+to external service is allowed to go through
+
+![Circuit Breaker Pattern Close State](assets/110.png)
+
+However, if at some point the failure rate exceeds a certain threshold, then the circuit breaker trips
+and goes into an open state.
+
+In the open state it stops any requests to go through and returns an error or throughs an exception
+immediately to the caller
+
+**This way we save the time waiting** for the image service to respond and also the **CPU and network resources**
+for making those calls to the faulty service
+
+![Circuit Breaker Pattern Open State](assets/111.png)
+
+---
 
 
 
