@@ -3,6 +3,7 @@
 - [Throttling and Rate Limiting Pattern](#throttling-and-rate-limiting-pattern)
 - [Retry Pattern](#retry-pattern)
 - [Circuit Breaker](#circuit-breaker)
+- [Dead Letter Queue (DLQ)](#dead-letter-queue-dlq)
 
 ---
 
@@ -498,10 +499,47 @@ Circuit Breaker Pattern is very powerful for handling long-lasting errors
 
 ---
 
+## Dead Letter Queue (DLQ)
+
+### Proble Statement
+
+Dead Letter Queue can let us handle a variety of errors that involve publishing and consuming messages
+through a Message Broker or a Distributed Message Queue
 
 
+**Event-Driven Architecture**
+
+Publisher ➡️ Message Broker ➡️ Consumer
 
 
+**Event-Driven Architecture Benefits**
+
+- Decoupling _producers_ from _consumers_
+- Greater Scalability
+- Asynchronous communication
+
+
+**Event-Driven Online Store**
+
+We have multiple topics and queues inside the Message Broker
+
+We also have different logic inside the consumer services
+
+
+![Dead Letter Queue Problem Statement](assets/113.png)
+
+**Potential issues: Order Service gets a new order**
+
+- but doesn't know which category it belongs (Non-existent topic)
+- or send it to order that doesn't exist
+- or send the order to a queue that is full
+- or message itself exceeds size limit and MB keeps rejecting it
+- or Consumer cannot process it
+  - retrying doesn't help or makes things worst
+  - can cause issue like queue limit exceeded / order delays
+
+
+---
 
 
 
