@@ -501,7 +501,7 @@ Circuit Breaker Pattern is very powerful for handling long-lasting errors
 
 ## Dead Letter Queue (DLQ)
 
-### Proble Statement
+### Problem Statement
 
 Dead Letter Queue can let us handle a variety of errors that involve publishing and consuming messages
 through a Message Broker or a Distributed Message Queue
@@ -540,6 +540,63 @@ We also have different logic inside the consumer services
 
 
 ---
+
+### Dead Letter Queue Pattern
+
+- Special queue in a messagae broker for messages that cannot be delivered to their destination
+- Types of ways for a message to get into the DLQ
+  - Programmatic Publishing
+    - e.g. if the order service doesn't know which topic to publish the message to
+    - e.g. if consumers don't know how to read a message they can republish it back to the DLQ
+  - Automatic transfer of messages from original queue
+    - Requires support from Message Broker
+    - e.g. publishing to a non-existing topic
+    - e.g. if a message stayed in the Message Broker for too long
+
+![Dead Letter Queue Pattern](assets/114.png)
+
+By using this pattern we can keep the normal, real-time pipeline in a healthy state and avoid
+clogging the queue due to a few problematic messages
+- Deal Letter messages are retained (and in order)
+
+---
+
+### Dead Letter Queue Pattern - Important Note
+
+- It's important to add information about the reason for the failure to the message that gets into the DLQ
+  - add a header to the message
+
+
+---
+
+### Dead Letter Queue Pattern - Open Questions
+
+
+- What to do with the messages in the Dead Letter Queue?
+  - Aggresive monitoring and alerting guarantee they don't just stay there
+  - Messages in DQL indicate an Issue
+    - Error details available from header
+  - We can move messages back to original queue
+  - We can process message manually
+
+---
+
+### Summary
+
+- Learned about the Dead Letter Queue Pattern
+- DLQ allows us to handle messages delivery failures in an Event Driven Architecture
+- Ways to publish messages to the DLQ
+  - Programmatic
+  - Automated (by the Message Broker)
+- Ways to process messages in the Dead Letter Queue
+  - Fix and Republish
+  - Manual (case-by case)
+
+---
+
+
+
+
 
 
 
