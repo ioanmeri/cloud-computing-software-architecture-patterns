@@ -1,6 +1,7 @@
 # Section 6: Deployment and Production Testing Patterns
 
 - [Rolling Deployment Pattern](#rolling-deployment-pattern)
+- [Blue-Green Deployment Pattern](#blue-green-deployment-pattern)
 
 ---
 
@@ -46,6 +47,8 @@ Then, we add that server back to the load balancer's group of backend servers
 
 We can rollback the release, if we see errors in dashboards (steps to the reverse)
 
+![Rolling Deployment Pattern](assets/116.png)
+
 ----
 
 ### Benefits
@@ -86,6 +89,58 @@ If the API has changed drastically, having two versions of the same service may 
   - Potential for Cascading Failures
   - 2 versions in production at the same time
 
+---
+
+## Blue-Green Deployment Pattern
+
+### Problem Statement
+
+Rolling Deployment: One instance at a time -> keep rolling until entire service has new version
+- Cascading failures
+- 2 versions in production
+
+---
+
+### Blue / Green Deployment
+
+- Blue Environment
+  - we keep the old version of our application instances running **throughout the entire duration** of the release
+- Green Environment
+  - deploy the new version on new servers
+
+after we verified that the instances
+- started up fine
+- run a few tests on them
+
+> We use the **load balancer to shift traffic** from the blue to the green environment
+
+If during this transition we start seeing issues in logs / monitor dashboard, we can easily stop the release and shift the traffic back to the blue environment (old version).
+
+![Blue Green Deployment](assets/117.png)
+
+Otherwise, we fully transfer the traffic to the new version and shut down the old environment (or keep it available for the next release)
+
+---
+
+### Blue-Green Deployment - Benefits
+
+- We have an equal amount of servers for Blue and Green environemnts
+  - if green environment fails, we can switch back to blue
+  - can take the full load of traffic
+- We can have a single version of the software at any given moment
+
+---
+
+### Blue-Green Deployment - Downsides
+
+- We need twice as many servers as we normally need
+  - in cloud we need to wait until all those servers start up
+  - pay for additional hardware
+  - if we use the **servers only for the release** - cost may not be high
+
+> Most popular choice for releasing new version
+
+---
 
 
 
