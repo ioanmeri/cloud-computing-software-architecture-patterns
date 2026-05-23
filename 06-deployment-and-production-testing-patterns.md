@@ -2,6 +2,7 @@
 
 - [Rolling Deployment Pattern](#rolling-deployment-pattern)
 - [Blue-Green Deployment Pattern](#blue-green-deployment-pattern)
+- [Canary Release and A/B Testing Deployment Patterns](#canary-release-and-ab-testing-deployment-patterns)
 
 ---
 
@@ -139,6 +140,97 @@ Otherwise, we fully transfer the traffic to the new version and shut down the ol
   - if we use the **servers only for the release** - cost may not be high
 
 > Most popular choice for releasing new version
+
+---
+
+## Canary Release and A/B Testing Deployment Patterns
+
+### Canary Release
+
+Borrows some elements from
+- Rolling Deployment Pattern
+- Blue-Green Deployment Pattern
+
+We dedicate a small subset of the - existing - group of servers and update them
+with the new version of our software
+- we can direct specific users to those servers
+
+![Canary Release](assets/118.png)
+
+Can be achieved by inspecting the **origin** in the Load Balancing service
+
+During this time **we monitor the performance** of the canary version and compare it in real time
+to the performance of the rest of the servers that run the old version
+
+----
+
+### Canary Release Pattern - Benefits and Challenges
+
+- Benefits
+  - Safety
+    - we monitor the performance for days
+- Challenges
+  - Setting clear success criteria for automated release and monitoring
+
+Internal Users or Beta Testers have
+- higher tolerance for issues
+- better knowledge of bug reporting
+
+---
+
+### A / B Testing or A / B Deployment Pattern
+
+**Canary Release**: Goal is releasing new version safely
+
+**A/B Testing**: Goal is testing new feature
+
+- Similar to Canary Deployment but with a different purpose
+- Can inform our product team for future features
+- Experimental software is removed - reverted to previous software version
+
+---
+
+### A / B Testing: Online Store
+
+Example: Test a new product recommendation algorithm
+
+We want to test if the change will generate more revenue
+- not ready to go full scale with the new version
+
+We can deploy an experimental version of our recommendation service on a small set of servers
+
+![A/B Testing](assets/119.png)
+
+---
+
+### A / B Testing Notes
+
+- Users don't know they are part of an experiment
+  - This gets us genuine data
+- All of us take part in A/B Testing as users (without knowing it)
+- Duration of the expirement depends on the use-case
+
+When we conclude the experiment
+- we divert traffic away from those experimental instances
+- deploy the main version of our recommendation service back
+- add them to the load balancing rotation
+
+Data scientists can look the metrics gathered during the experiment and asess if the change should be released
+as part of a future version
+
+---
+
+### Summary
+
+- Both Canary Release and A / B Deployment Patterns allows us to dedicate a small portion of servers for a different version of software
+- During the Canary Release
+  - We monitor for
+    - Performance
+    - Functionality
+  - Limit to internal users or beta testers
+- During a A / B Testing
+  - Prefer real traffic
+  - By the end we roll back to the original version
 
 ---
 
