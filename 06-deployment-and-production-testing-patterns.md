@@ -301,6 +301,142 @@ Configured LB for this scenario but
 
 ---
 
+### Chaos Engineering Pattern
+
+The purpose is to deliberatily and systymatically inject random but controlled failures
+into or own Production System.
+
+Then, we monitor how our system responds to those failures and analysize the results.
+
+If we find that the system did not respond the way we expected, we create a plan to fix it.
+
+Then continue testing.
+
+
+---
+
+### Chaos Engineering - Additonal Benefits
+
+- Force engineers to thinking about failures during development
+- Test the ability of the development team to
+  - Monitor
+  - Recognize outages
+  - Analyse logs
+  - Discover production issues
+- Over time
+  - The system becomes more
+    - Resilient
+    - Reliable
+  - The development team becomes more proficient in
+    - Monitoring
+    - Fixing production issues
+
+
+---
+
+### Chaos Engineering - First Step
+
+> Take Biased Human Factor out of the Equation
+
+Build or use automated tools to randomly cause those failures
+
+![Chaos Engineering Step 1 - Inject Failure](assets/123.png)
+
+
+**Tool: Chaos Monkey**
+
+- Chaos Monkey (2011) by Netflix
+- Responsible for randomly terminating cloud servers in production
+- Chaos Engineering has gone beyond killing virutal machines since then
+
+---
+
+### Failure Injection Tools
+
+- Latency Injection
+- Restrict Access to Database
+  - Test if can gracefully fail over to another replica in another cloud zone / region
+- Resource Exhaustion
+  - Deliberatily fill up the disk space on one service instance or DB
+  - Disable traffic to entire zone or traffic
+    - Make sure that fails over to the other zone or region
+      - gracefully
+      - transparently to the user
+
+
+![Chaos Engineering Zone Fail Over Check](assets/124.png)
+
+
+---
+
+### Chaos Engineering
+
+1. Measure Baseline
+2. Construct a Hypothesis
+   2.1. Formalizing the desired correct behavior we expect
+3. Failure Injection
+4. Monitor it for a predifined period of time
+5. Documenting the Findings
+6. Restore to the Original State
+
+After all those steps are complete, we identify the issues we found and act upon them to improve
+the reciliency of our system.
+
+> The key is to keep performing those tests continuously
+
+Only the continuous testing will ensure that new changes, don't introduce 
+- single points of failure
+- performance bottlenecks
+
+We make sure that the development team has enough Tools, Dashboards and Logs to fix those issues.
+
+---
+
+### Chaos Engineering - Important Considerations
+
+- Minimizing the "blast radius" of failures
+  - Make sure the negative impact to users is minimal
+- Staying within our "error budget"
+- Never promising 100% availability to users leaves room for
+  - Unexpected
+  - Delibare failures
+
+---
+
+### Summary
+
+- Chaos Engineering Pattern
+  - Increases confidence
+  - Protects production against critical failures
+- Allows finding
+  - Single Points of Failure
+  - Scalability issues
+  - Performance bottlenecks
+- Ensures that real failures are dealt with gracefully
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
