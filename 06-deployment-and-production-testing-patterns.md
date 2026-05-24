@@ -3,6 +3,7 @@
 - [Rolling Deployment Pattern](#rolling-deployment-pattern)
 - [Blue-Green Deployment Pattern](#blue-green-deployment-pattern)
 - [Canary Release and A/B Testing Deployment Patterns](#canary-release-and-ab-testing-deployment-patterns)
+- [Chaos Engineering Production Testing Pattern](#chaos-engineering-production-testing-pattern)
 
 ---
 
@@ -233,6 +234,73 @@ as part of a future version
   - By the end we roll back to the original version
 
 ---
+
+## Chaos Engineering Production Testing Pattern
+
+We can write
+- Unit tests
+  - Individual components of each service
+- Functional tests
+- Integration tests
+
+to make sure that each service functions well at each own as well as in conjuction with other services
+
+---
+
+### Problem statement
+
+In production, issues occur that we cannot test beforehand
+- Infrastracture can break at any time
+  - Servers can lose power
+  - Network Switches can break down
+  - DB devices can become unusable
+- Natural disasters can hit the datacenters
+- 3rd-Party Service Outage
+
+
+![Chaos Engineering Infrastracture fail](assets/120.png)
+
+---
+
+### Chaos Engineering - Motivation
+
+- We won't know about those issues until they actually happen
+- When they do happen it may be too late
+- Those issues are very rare
+- The results of those issue can be catastrophic
+
+> **Solution of Chaos Engineering**: Embracing the inherent chaos in a bloud-based Distributed System
+
+<br><br>
+**Example 1: Online News Magazine**
+
+- Sudden external event occurs ➡️ Traffic spike
+  - Can configure **LB auto-scaling** policy configured based on **requests/sec**
+  - In reality, it's possible that before that threshold is met all servers become unusable
+    - **CPU Utilization: 100%**
+    - Very High Memory Consumption
+   
+![Chaos Engineering LB fail example](assets/121.png)
+
+<br><br>
+
+**Example 2: Online Stock Trading Broker**
+
+Configured LB for this scenario but
+
+- Sudden Global Economic Event
+  - Authentication Service Fails
+  - External Stock Price API Throttled
+  - Excessive queries to one database instance
+ 
+![Chaos Engineering LB Auth Fail, 3rd party, DB overload](assets/122.png)
+
+<br><br>
+
+> We won't know it fails until it happens
+
+---
+
 
 
 
